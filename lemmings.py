@@ -16,22 +16,27 @@ class Lemmings(object):
         self.colonne = colonne
         self.direction = direction
         self.jeu = j
+        self.jeu.grotte[self.ligne][self.colonne].arrivee(self)
         
     def __str__(self):
         return self.direction
     
-    def action(self):
+    def action(self, index):
+        self.index = index
         if self.jeu.grotte[self.ligne+1][self.colonne].libre():
             self.jeu.grotte[self.ligne+1][self.colonne].arrivee(self)
             self.jeu.grotte[self.ligne][self.colonne].terrain = " "
+            self.jeu.grotte[self.ligne][self.colonne].lemming = None
             self.ligne += 1
         elif self.jeu.grotte[self.ligne][self.colonne-1].libre() and self.direction == "<":
             self.jeu.grotte[self.ligne][self.colonne-1].arrivee(self)
             self.jeu.grotte[self.ligne][self.colonne].terrain = " "
+            self.jeu.grotte[self.ligne][self.colonne].lemming = None
             self.colonne -= 1
         elif self.jeu.grotte[self.ligne][self.colonne+1].libre() and self.direction == ">":
             self.jeu.grotte[self.ligne][self.colonne+1].arrivee(self)
             self.jeu.grotte[self.ligne][self.colonne].terrain = " "
+            self.jeu.grotte[self.ligne][self.colonne].lemming = None
             self.colonne += 1
         else:
             if self.direction == ">":
@@ -39,13 +44,11 @@ class Lemmings(object):
             else:
                 self.direction = '>'
             
-            
     def sort(self):
         self.jeu.grotte[self.ligne][self.colonne].terrain = "O"
-        self.jeu.grotte[self.ligne][self.colonne].lemming = None
-        
-        
-    
+        self.jeu.grotte[self.ligne][self.colonne].lemming = None    
+        del self.jeu.all[self.index]
+          
 #Main class initialisation and déroulement
 class Jeu(object):
     
@@ -60,27 +63,24 @@ class Jeu(object):
             print("")
     
     def tour(self):
-        for lim in self.all:
-            lim.action()
-        self.affiche()
+        self.i = 0
+        for elements in self.all:
+           elements.action(self.i)
+           self.i += 1
     
     def demarre(self):
-        try: 
-            while True:
-                cmd = input(">>>")
-                if cmd == "l":
-                    l = Lemmings(0,1,">",self)
-                    self.all.append(l)
-                elif cmd == 'q':
-                    sys.exit(1)
-                else:
-                    self.tour()
-                    
-                self.affiche()
-                
-        except Exception as e:
-            print(e)
-            sys.exit(1)
+        while True:
+            print("")
+            self.affiche()
+            cmd = input(">>>")
+            if cmd == "l":
+                l = Lemmings(0,1,">",self)
+                self.all.append(l)
+            elif cmd == 'q':
+                sys.exit(1)
+            else:
+                self.tour()   
+
     
 class Case(object):
     
@@ -92,7 +92,7 @@ class Case(object):
         if self.lemming == None:
             return self.terrain
         else:
-            return self.lemming
+            return self.lemming.direction
     
     def libre(self):
         if self.terrain != "#" and self.lemming == None:
@@ -109,29 +109,22 @@ class Case(object):
     
     
 #démarrage du jeu
-try:
-    file = "lemmings-carte.txt"
-    
-    fichier = open(file, "r")
-    
-    tableau = []
-    
-    for ligne in fichier:
-        line = []
-        for car in ligne.strip('\n'):
-            case = Case(car, None)
-            line.append(case)
-        tableau.append(line)
-    fichier.close()
-    
-    print(tableau)
-    print("ok")
-    
-    game = Jeu(tableau)
-    game.demarre()
-except Exception as e:
-    print("Erreur avec le fichier...")
-    print(e)
-finally:
-    print()
-    print("Finish...")
+file = "carte.txt"
+
+fichier = open(file, "r")
+
+tableau = []
+
+for ligne in fichier:
+    line = []
+    for car in ligne.strip('\n'):
+        case = Case(car, None)
+        line.append(case)
+    tableau.append(line)
+fichier.close()
+
+game = Jeu(tableau)
+game.demarre()
+
+print()
+print("Finish...")
