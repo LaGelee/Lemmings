@@ -25,17 +25,14 @@ class Lemmings(object):
         self.index = index
         if self.jeu.grotte[self.ligne+1][self.colonne].libre():
             self.jeu.grotte[self.ligne+1][self.colonne].arrivee(self)
-            self.jeu.grotte[self.ligne][self.colonne].terrain = " "
             self.jeu.grotte[self.ligne][self.colonne].lemming = None
             self.ligne += 1
         elif self.jeu.grotte[self.ligne][self.colonne-1].libre() and self.direction == "<":
             self.jeu.grotte[self.ligne][self.colonne-1].arrivee(self)
-            self.jeu.grotte[self.ligne][self.colonne].terrain = " "
             self.jeu.grotte[self.ligne][self.colonne].lemming = None
             self.colonne -= 1
         elif self.jeu.grotte[self.ligne][self.colonne+1].libre() and self.direction == ">":
             self.jeu.grotte[self.ligne][self.colonne+1].arrivee(self)
-            self.jeu.grotte[self.ligne][self.colonne].terrain = " "
             self.jeu.grotte[self.ligne][self.colonne].lemming = None
             self.colonne += 1
         else:
@@ -45,16 +42,16 @@ class Lemmings(object):
                 self.direction = '>'
             
     def sort(self):
-        self.jeu.grotte[self.ligne][self.colonne].terrain = "O"
         self.jeu.grotte[self.ligne][self.colonne].lemming = None    
         del self.jeu.all[self.index]
           
 #Main class initialisation and déroulement
 class Jeu(object):
     
-    def __init__(self, grotte):
+    def __init__(self, grotte, entree):
         self.grotte = grotte
         self.all = []
+        self.entree = entree
     
     def affiche(self):
         for elements in self.grotte:
@@ -74,14 +71,17 @@ class Jeu(object):
             self.affiche()
             cmd = input(">>>")
             if cmd == "l":
-                l = Lemmings(0,1,">",self)
-                self.all.append(l)
+                if self.grotte[self.entree[0]][self.entree[1]].libre() :
+                    l = Lemmings(self.entree[0],self.entree[1],">",self)
+                    self.all.append(l)
+                else:
+                    print("Attention l'entrée est pleine...")
             elif cmd == 'q':
-                sys.exit(1)
+                break
             else:
                 self.tour()   
 
-    
+#Gère toutes les cases et le contenu (lemming,mur,sortie)
 class Case(object):
     
     def __init__(self, terrain, lemming):
@@ -123,8 +123,9 @@ for ligne in fichier:
     tableau.append(line)
 fichier.close()
 
-game = Jeu(tableau)
+game = Jeu(tableau,[0,1])
 game.demarre()
 
 print()
 print("Finish...")
+input()
