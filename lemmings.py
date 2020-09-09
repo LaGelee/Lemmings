@@ -48,7 +48,7 @@ class Lemmings(object):
     #supprimme le lemming de la liste générale et da la partie
     def sort(self):
         self.jeu.grotte[self.ligne][self.colonne].depart() 
-        del self.jeu.all[self.index]
+        self.jeu.all[self.index] = None
           
 #Main class initialisation and déroulement
 class Jeu(object):
@@ -70,9 +70,10 @@ class Jeu(object):
     def tour(self):
         self.i = 0
         for elements in self.all:
-           elements.action(self.i)
-           self.i += 1
-    
+            elements.action(self.i)
+            self.i += 1
+        self.all = [i for i in self.all if i != None]
+
     #fonction princiaple du jeu qui permet de gérer les inputs et faire les actions associées
     def demarre(self):
         while True:
@@ -137,15 +138,19 @@ def map(fichier):
 
     return tableau
 
-#rècupère le tableau de la map
-fichier = "carte.txt"
-tableau = map(fichier)
+try:
+    #rècupère le tableau de la map
+    fichier = "carte.txt"
+    tableau = map(fichier)
 
-#met en place le jeu et le lance 
-game = Jeu(tableau,[0,1])
-game.demarre()
-
-#petit affichage de fin
-print()
-print("Finish...")
-input()
+    #met en place le jeu et le lance 
+    game = Jeu(tableau,[0,1])
+    game.demarre()
+except Exception as e:
+    print("Oups il y a un erreur...")
+    print("Erreur:",e)
+finally:
+    #petit affichage de fin
+    print()
+    print("Finish...")
+    input()
