@@ -88,8 +88,10 @@ class Jeu(object):
                     print("Attention l'entrée est pleine...")
             elif cmd == 'q':
                 break
+            elif cmd == "":
+                self.tour()
             else:
-                self.tour()   
+                print("Commande invalide...")   
 
 #Gère toutes les cases et le contenu (lemming,mur,sortie)
 class Case(object):
