@@ -6,8 +6,9 @@ Description: Mini-projet Lemmings
 Date: 07/09/2020
 """
 
-#juste pour pouvoir quitter le programme
-import sys
+#juste pour pouvoir avoir la verssion du système
+from sys import platform
+from os import system
 
 # Classe qui créé les joueurs
 class Lemmings(object):
@@ -54,10 +55,11 @@ class Lemmings(object):
 class Jeu(object):
     
     #met en place l'entrée, la map et une liste pour stoquer tous les lemmings (les faire jouer dans l'ordre d'arrivée)
-    def __init__(self, grotte, entree):
+    def __init__(self, grotte, entree, clear):
         self.grotte = grotte
         self.all = []
         self.entree = entree
+        self.clear = clear
     
     #affiche la map et les lemmings en faisant print() car chaque caractère est un objet Case
     def affiche(self):
@@ -76,22 +78,28 @@ class Jeu(object):
 
     #fonction princiaple du jeu qui permet de gérer les inputs et faire les actions associées
     def demarre(self):
+        self.message = None
         while True:
-            print("")
+            system(self.clear)
             self.affiche()
+
+            if self.message:
+                print(self.message)
+                self.message = None
+
             cmd = input(">>>")
             if cmd == "l":
                 if self.grotte[self.entree[0]][self.entree[1]].libre() :
                     l = Lemmings(self.entree[0],self.entree[1],">",self)
                     self.all.append(l)
                 else:
-                    print("Attention l'entrée est pleine...")
+                    self.message = "Attention l'entrée est pleine..."
             elif cmd == 'q':
                 break
             elif cmd == "":
                 self.tour()
             else:
-                print("Commande invalide...")   
+                self.message = "Commande invalide..."   
 
 #Gère toutes les cases et le contenu (lemming,mur,sortie)
 class Case(object):
@@ -145,8 +153,16 @@ try:
     fichier = "carte.txt"
     tableau = map(fichier)
 
+    #récupérer la verssion de l'os et donc la commande clear
+    if platform == "linux" or platform == "linux2":
+        clear = "clear"
+    elif platform == "darwin":
+        clear = "clear"
+    else:
+        clear = "cls"
+
     #met en place le jeu et le lance 
-    game = Jeu(tableau,[0,1])
+    game = Jeu(tableau,[0,1],clear)
     game.demarre()
 except Exception as e:
     print("Oups il y a un erreur...")
