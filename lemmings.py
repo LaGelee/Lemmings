@@ -80,7 +80,9 @@ class Jeu(object):
     def demarre(self):
         self.message = None
         while True:
-            system(self.clear)
+            if self.clear != None:
+                system(self.clear)
+
             self.affiche()
 
             if self.message:
@@ -154,12 +156,14 @@ try:
     tableau = map(fichier)
 
     #récupérer la verssion de l'os et donc la commande clear
-    if platform == "linux" or platform == "linux2":
+    if platform.startswith("linux"):
         clear = "clear"
     elif platform == "darwin":
         clear = "clear"
-    else:
+    elif platform.startswith("win"):
         clear = "cls"
+    else:
+        clear = None
 
     #met en place le jeu et le lance 
     game = Jeu(tableau,[0,1],clear)
